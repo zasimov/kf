@@ -6,6 +6,10 @@ Kalman Filter.
 
 ## How to build
 
+Note: do not forget to checkout submodules
+
+    git submodule update --init
+
 The following system packages should be installed:
 
   * `cmake`
@@ -28,6 +32,8 @@ Note: the `pre-build.sh` script can be used to build the required dependencies.
     wget http://bitbucket.org/eigen/eigen/get/3.3.4.tar.gz
     tar zxf 3.3.4.tar.gz
     sudo cp -R eigen-eigen-5a0156e40feb/Eigen /usr/local/include
+
+Note: Eigen is included to project as git-submodule.
 
 Use the following commands to build applications:
 
