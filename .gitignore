@@ -1,0 +1,6 @@
+*.o
+build
+debug
+*~
+build-googletest
+*.log
