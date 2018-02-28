@@ -1,6 +1,10 @@
 #!/bin/bash
 
-NUM_CPU=$(cat /proc/cpuinfo | grep "^processor" | wc -l)
+if [ -f /proc/cpuinfo ]; then
+    NUM_CPU=$(cat /proc/cpuinfo | grep "^processor" | wc -l)
+else
+    NUM_CPU=1
+fi
 
 git submodule update --init
 

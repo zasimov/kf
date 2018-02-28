@@ -5,11 +5,23 @@ Kalman Filter.
 
 ## How to build (light way)
 
+### Ubuntu
+
+    sudo apt-get update && sudo apt-get install -y cmake g++ make libssl-dev libuv-dev git
     git clone https://github.com/zasimov/kf
     cd kf && ./pre-build.sh && mkdir build && cd build && cmake .. && make
 
 Note: you don't need to install the latest version of uWebSockets to your `/usr`.
-      `ekf` will use `uWS.so` from kf/uWebSockets directory.
+      `ekf` will use `uWS.so` from `kf/uWebSockets` directory.
+
+### Mac OS
+
+    brew install libuv openssl
+    git clone https://github.com/zasimov/kf
+    cd kf && ./pre-build.sh && mkdir build && cd build
+    cmake -DOPENSSL_LIBRARIES=/usr/local/opt/openssl/lib -DOPENSSL_INCLUDE_DIR=/usr/local/opt/openssl/include ..
+    make
+    export DYLD_LIBRARY_PATH=$(pwd)/../uWebSockets/
 
 ## How to build (hard way)
 

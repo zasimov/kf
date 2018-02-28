@@ -6,6 +6,10 @@ set(EIGEN_PATH ${CMAKE_CURRENT_SOURCE_DIR}/eigen-git-mirror)
 include_directories(${EIGEN_PATH})
 set(UWS_LIB_PATH ${CMAKE_CURRENT_SOURCE_DIR}/uWebSockets)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)
+IF(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
+   # Mac OS X specific code
+   include_directories(/usr/local/opt/openssl/include)
+ENDIF(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
 
 set(CXX_FLAGS "-Wall")
 set(CMAKE_CXX_FLAGS, "${CXX_FLAGS}")
