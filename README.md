@@ -10,6 +10,7 @@ Kalman Filter.
     sudo apt-get update && sudo apt-get install -y cmake g++ make libssl-dev libuv-dev git
     git clone https://github.com/zasimov/kf
     cd kf && ./pre-build.sh && mkdir build && cd build && cmake .. && make
+    export LD_LIBRARY_PATH=$(pwd)../uWebSockets  # optional
 
 Note: you don't need to install the latest version of uWebSockets to your `/usr`.
       `ekf` will use `uWS.so` from `kf/uWebSockets` directory.
