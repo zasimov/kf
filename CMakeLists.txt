@@ -4,6 +4,8 @@ project (EKF)
 
 set(EIGEN_PATH ${CMAKE_CURRENT_SOURCE_DIR}/eigen-git-mirror)
 include_directories(${EIGEN_PATH})
+set(UWS_LIB_PATH ${CMAKE_CURRENT_SOURCE_DIR}/uWebSockets)
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)
 
 set(CXX_FLAGS "-Wall")
 set(CMAKE_CXX_FLAGS, "${CXX_FLAGS}")
@@ -12,7 +14,7 @@ find_package(OpenSSL REQUIRED)
 find_package(ZLIB REQUIRED)
 find_package(Threads REQUIRED)
 find_library(UV_LIBRARY NAMES uv)
-find_library(UWS_LIBRARY NAMES uWS)
+find_library(UWS_LIBRARY NAMES uWS PATHS ${UWS_LIB_PATH} NO_DEFAULT_PATH)
 find_library(M_LIBRARY NAMES m)
 
 add_executable(ekf main.cpp math.cpp parser.cpp protocol.cpp logging.cpp kalman_filter.cpp matrices.cpp fusionekf.cpp)

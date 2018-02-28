@@ -3,8 +3,15 @@
 This repository contains implementations of Kalman Filter and Extended
 Kalman Filter.
 
+## How to build (light way)
 
-## How to build
+    git clone https://github.com/zasimov/kf
+    cd kf && ./pre-build.sh && mkdir build && cd build && cmake .. && make
+
+Note: you don't need to install the latest version of uWebSockets to your `/usr`.
+      `ekf` will use `uWS.so` from kf/uWebSockets directory.
+
+## How to build (hard way)
 
 Note: do not forget to checkout submodules
 
@@ -116,8 +123,6 @@ The applications were tested with https://github.com/udacity/self-driving-car-si
     # clone kf
     git clone https://github.com/zasimov/kf
     cd kf && git submodule update --init && ./pre-build.sh
-    sudo make -C uWebSockets install
-    sudo cp -r eigen-git-mirror/Eigen /usr/local/include
     mkdir build && cd build
     cmake .. && make
 
