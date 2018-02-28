@@ -15,7 +15,9 @@ popd
 make -C uWebSockets -j${NUM_CPU}
 
 echo
+echo "***************************************************************"
 echo "to finish installation you should run these commands from root:"
+echo "***************************************************************"
 echo "make -C build-googletest install | tee googletest.log"
 echo "make -C uWebSockets install | tee uWebSockets.log"
 echo "cp -r eigen-git-mirror/Eigen /usr/local/include"
