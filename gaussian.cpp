@@ -1,3 +1,4 @@
+#include <iostream>
 #include <cmath>
 
 #include "gaussian.h"
@@ -75,14 +76,14 @@ Eigen::VectorXd CalculatePredictedMean(const Eigen::VectorXd &weights, const Eig
 }
 
 
-Eigen::MatrixXd CalculatePredictedCovMatrix(const Eigen::VectorXd &x, const Eigen::VectorXd &weights, const Eigen::MatrixXd &Xsig_pred) {
+Eigen::MatrixXd CalculatePredictedCovMatrix(const Eigen::VectorXd &x, const Eigen::VectorXd &weights, const Eigen::MatrixXd &Xsig_pred, const unsigned angle_idx) {
   Eigen::MatrixXd P(Xsig_pred.rows(), Xsig_pred.rows());
 
   P.fill(0.0);
 
   for (unsigned i = 0; i < Xsig_pred.cols(); i++) {
     Eigen::VectorXd df = Xsig_pred.col(i) - x;
-    df(3) = NormalizeAngle(df(3));
+    df(angle_idx) = NormalizeAngle(df(angle_idx));
 
     P = P + weights(i) * df * df.transpose();
   }
@@ -91,9 +92,9 @@ Eigen::MatrixXd CalculatePredictedCovMatrix(const Eigen::VectorXd &x, const Eige
 }
 
 
-Gaussian PredictGaussian(const Eigen::VectorXd &weights, const Eigen::MatrixXd &Xsig_pred) {
+Gaussian PredictGaussian(const Eigen::VectorXd &weights, const Eigen::MatrixXd &Xsig_pred, const unsigned angle_idx) {
   const Eigen::VectorXd x = CalculatePredictedMean(weights, Xsig_pred);
-  const Eigen::MatrixXd P = CalculatePredictedCovMatrix(x, weights, Xsig_pred);
+  const Eigen::MatrixXd P = CalculatePredictedCovMatrix(x, weights, Xsig_pred, angle_idx);
 
   Gaussian g(x.size());
   g.x_ = x;

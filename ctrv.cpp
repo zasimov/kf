@@ -46,3 +46,31 @@ Eigen::VectorXd CtrvProcessModel(const Eigen::VectorXd &x_aug, const double dt) 
 
   return x_pred;
 }
+
+
+Eigen::VectorXd CtrvMeasurementModel(const Eigen::VectorXd &x) {
+  const double px = x(0);
+  const double py = x(1);
+  const double v  = x(2);
+  const double yaw = x(3);
+
+  const double v1 = cos(yaw) * v;
+  const double v2 = sin(yaw) * v;
+
+  Eigen::VectorXd z(kCtrvZDim);
+  z(0) = sqrt(px * px + py * py);                        //r
+  // FIXME: check atan2(0, 0)
+  z(1) = atan2(py, px);                                  //phi
+  z(2) = (px * v1 + py * v2) / sqrt(px * px + py * py);  //r_dot
+
+  return z;
+}
+
+
+Eigen::MatrixXd CtrvMeasurementNoise(const double std_radr, const double std_radphi, const double std_radrd) {
+  Eigen::MatrixXd R(kCtrvZDim, kCtrvZDim);
+  R << std_radr * std_radr, 0, 0,
+    0, std_radphi * std_radphi, 0,
+    0, 0, std_radrd * std_radrd;
+  return R;
+}

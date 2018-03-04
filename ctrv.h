@@ -6,6 +6,7 @@
 
 static const int kCtrvStateDim = 5;
 static const int kCtrvAugStateDim = 7;
+static const int kCtrvZDim = 3;
 
 
 /*
@@ -16,6 +17,22 @@ static const int kCtrvAugStateDim = 7;
  *
  */
 Eigen::VectorXd CtrvProcessModel(const Eigen::VectorXd &x_aug, const double dt);
+
+
+/*
+ * Map sigma point to measurement space.
+ */
+Eigen::VectorXd CtrvMeasurementModel(const Eigen::VectorXd &x);
+
+/*
+ * Calculate measurement noise matrix
+ *
+ * std_radr - radar measurement noise standard deviation radius in m
+ * std_radphi - radar measurement noise standard deviation angle in rad
+ * std_radrd - radar measurement noise standard deviation radius change in m/s
+ *
+ */
+Eigen::MatrixXd CtrvMeasurementNoise(const double std_radr, const double std_radphi, const double std_radrd);
 
 
 #endif

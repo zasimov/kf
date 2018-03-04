@@ -45,7 +45,13 @@ Eigen::VectorXd CalculateSigmaWeights(const double lambda, const int n_aug);
 
 /*
  * Predict gaussian using predicted sigma points
+ *
+ * FIXME: wipe out angle_idx
+ * angle_idx:
+ *   3 for ctrv process model
+ *   1 for ctrv measurement model
+ *
  */
-Gaussian PredictGaussian(const Eigen::VectorXd &weights, const Eigen::MatrixXd &Xsig_pred);
+Gaussian PredictGaussian(const Eigen::VectorXd &weights, const Eigen::MatrixXd &Xsig_pred, const unsigned angle_idx);
 
 #endif
