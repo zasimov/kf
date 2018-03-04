@@ -43,7 +43,7 @@ IF (GTEST_FOUND)
    add_executable(testmath math.cpp logging.cpp math_test.cpp)
    target_link_libraries(testmath ${GTEST_BOTH_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT} ${M_LIBRARY})
 
-   add_executable(testgaussian gaussian.cpp gaussian_test.cpp)
+   add_executable(testgaussian gaussian.cpp math.cpp logging.cpp gaussian_test.cpp)
    target_link_libraries(testgaussian ${GTEST_BOTH_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT} ${M_LIBRARY})
 
    add_executable(testctrv ctrv.cpp math.cpp logging.cpp ctrv_test.cpp)

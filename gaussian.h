@@ -34,6 +34,12 @@ Eigen::MatrixXd CalculateSigmaPoints(double lambda, const Eigen::VectorXd &x, co
  * `stdv` - process noise vector (standard deviations)
  *
  */
-Gaussian AugmentGaussian(const Gaussian &g, const Eigen::VectorXd stdv);
+Gaussian AugmentGaussian(const Gaussian &g, const Eigen::VectorXd &stdv);
+
+
+/*
+ * Predict gaussian using predicted sigma points
+ */
+Gaussian PredictGaussian(const Eigen::MatrixXd &Xsig_pred, const double lambda, const int n_aug);
 
 #endif
