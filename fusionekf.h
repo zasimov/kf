@@ -53,7 +53,7 @@ class FusionEKF {
    */
   const Eigen::VectorXd GetEstimate() const;
 
-  std::shared_ptr<KalmanFilterState> GetState() const {
+  std::shared_ptr<Gaussian> GetState() const {
     return state_;
   }
 
@@ -84,7 +84,7 @@ class FusionEKF {
   Eigen::VectorXd GetZ(const struct measurement &m) const;
 
  private:
-  struct std::shared_ptr<KalmanFilterState> state_;
+  struct std::shared_ptr<Gaussian> state_;
   Clock clock_;
 
   // matrices

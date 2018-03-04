@@ -5,22 +5,12 @@
 
 #include <Eigen/Dense>
 
-
-struct KalmanFilterState {
-  Eigen::VectorXd x_;  // mean vector
-  Eigen::MatrixXd P_;  // state covariance matrix
-
-  bool is_initialized_;
-
-  KalmanFilterState(unsigned x_size)
-  : x_(x_size), P_(x_size, x_size), is_initialized_(false){
-  }
-};
+#include "gaussian.h"
 
 
 class AbstractKalmanFilter {
  public:
-  AbstractKalmanFilter(std::shared_ptr<KalmanFilterState> state,
+  AbstractKalmanFilter(std::shared_ptr<Gaussian> state,
 		       const Eigen::MatrixXd &R);
 
   virtual ~AbstractKalmanFilter() {
@@ -68,7 +58,7 @@ class AbstractKalmanFilter {
   virtual Eigen::VectorXd GetY(const Eigen::VectorXd &z) const = 0;
 
  protected:
-  std::shared_ptr<KalmanFilterState> state_;
+  std::shared_ptr<Gaussian> state_;
 
  private:
   Eigen::MatrixXd R_;  // measurement covariance matrix
@@ -79,7 +69,7 @@ class AbstractKalmanFilter {
 
 class LinearKalmanFilter : public AbstractKalmanFilter {
  public:
-  LinearKalmanFilter(std::shared_ptr<KalmanFilterState> state,
+  LinearKalmanFilter(std::shared_ptr<Gaussian> state,
 		     const Eigen::MatrixXd &R,
 		     const Eigen::MatrixXd &H);
 
@@ -97,7 +87,7 @@ class LinearKalmanFilter : public AbstractKalmanFilter {
 
 class ExtendedKalmanFilter : public AbstractKalmanFilter {
  public:
-  ExtendedKalmanFilter(std::shared_ptr<KalmanFilterState> state,
+  ExtendedKalmanFilter(std::shared_ptr<Gaussian> state,
 		       const Eigen::MatrixXd &R);
 
   void Init(const Eigen::VectorXd &z);

@@ -35,7 +35,7 @@ std::string Clock::NowStr() const {
 FusionEKF::FusionEKF()
   : clock_(0), F_(4, 4), u_(4) {
 
-  state_ = std::make_shared<KalmanFilterState>(4);  // 4 is a dimension of state space
+  state_ = std::make_shared<Gaussian>(4);  // 4 is a dimension of state space
 
   state_->x_ << 1, 1, 1, 1;
   state_->P_ << 1, 0, 0,                       0,

@@ -1,10 +1,11 @@
 #include <cassert>
 
+#include "gaussian.h"
 #include "kalman_filter.h"
 #include "math.h"
 
 
-AbstractKalmanFilter::AbstractKalmanFilter(std::shared_ptr<KalmanFilterState> state,
+AbstractKalmanFilter::AbstractKalmanFilter(std::shared_ptr<Gaussian> state,
 					   const Eigen::MatrixXd &R):
   state_(state), R_(R) {
 
@@ -39,7 +40,7 @@ const Eigen::VectorXd& AbstractKalmanFilter::GetEstimate() const {
 }
 
 
-LinearKalmanFilter::LinearKalmanFilter(std::shared_ptr<KalmanFilterState> state,
+LinearKalmanFilter::LinearKalmanFilter(std::shared_ptr<Gaussian> state,
 				       const Eigen::MatrixXd &R,
 				       const Eigen::MatrixXd &H)
   : AbstractKalmanFilter(state, R), H_(H) {
@@ -65,7 +66,7 @@ Eigen::VectorXd LinearKalmanFilter::GetY(const Eigen::VectorXd &z) const {
 }
 
 
-ExtendedKalmanFilter::ExtendedKalmanFilter(std::shared_ptr<KalmanFilterState> state,
+ExtendedKalmanFilter::ExtendedKalmanFilter(std::shared_ptr<Gaussian> state,
 					   const Eigen::MatrixXd &R)
   : AbstractKalmanFilter(state, R) {
 
