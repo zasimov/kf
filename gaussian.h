@@ -16,4 +16,12 @@ struct Gaussian {
   }
 };
 
+
+/*
+ * CalculateSigmaPoints returns (n, 2n + 1) matrix where n is a size of `x_` vector.
+ *
+ * `lambda` defines a scale
+ */
+Eigen::MatrixXd CalculateSigmaPoints(double lambda, const Eigen::VectorXd &x, const Eigen::MatrixXd &P);
+
 #endif
