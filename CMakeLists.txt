@@ -28,9 +28,9 @@ target_link_libraries(ekf ${UV_LIBRARY} ${UWS_LIBRARY} ${ZLIB_LIBRARIES} ${OPENS
 add_executable(objpose objpose.cpp math.cpp parser.cpp logging.cpp kalman_filter.cpp matrices.cpp fusionekf.cpp)
 set_property(TARGET objpose PROPERTY CXX_STANDARD 11)
 
-IF (BUILD_TESTING)
+find_package(GTest)
+IF (GTEST_FOUND)
    enable_testing()
-   find_package(GTest REQUIRED)
    include_directories(${GTEST_INCLUDE_DIRS})
 
    add_executable(testparser parser.cpp parser_test.cpp)
@@ -46,6 +46,6 @@ IF (BUILD_TESTING)
    add_test(NAME parser COMMAND testparser)
    add_test(NAME matrices COMMAND testmatrices)
    add_test(NAME math COMMAND testmath)
-ENDIF(BUILD_TESTING)
+ENDIF(GTEST_FOUND)
 
 add_executable(testfile parser.cpp testfile.cpp)
