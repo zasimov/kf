@@ -50,10 +50,7 @@ Gaussian AugmentGaussian(const Gaussian &g, const Eigen::VectorXd &stdv) {
 }
 
 
-/*
- * Calculate weights using lambda and dimension of augmented space
- */
-Eigen::VectorXd CalculateWeights(const double lambda, const int n_aug) {
+Eigen::VectorXd CalculateSigmaWeights(const double lambda, const int n_aug) {
   Eigen::VectorXd weights(2 * n_aug + 1);
 
   weights(0) = lambda / (lambda + n_aug);
@@ -94,8 +91,7 @@ Eigen::MatrixXd CalculatePredictedCovMatrix(const Eigen::VectorXd &x, const Eige
 }
 
 
-Gaussian PredictGaussian(const Eigen::MatrixXd &Xsig_pred, const double lambda, const int n_aug) {
-  const Eigen::VectorXd weights = CalculateWeights(lambda, n_aug);
+Gaussian PredictGaussian(const Eigen::VectorXd &weights, const Eigen::MatrixXd &Xsig_pred) {
   const Eigen::VectorXd x = CalculatePredictedMean(weights, Xsig_pred);
   const Eigen::MatrixXd P = CalculatePredictedCovMatrix(x, weights, Xsig_pred);
 

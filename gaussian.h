@@ -38,8 +38,14 @@ Gaussian AugmentGaussian(const Gaussian &g, const Eigen::VectorXd &stdv);
 
 
 /*
+ * Calculate weights using lambda and dimension of augmented space
+ */
+Eigen::VectorXd CalculateSigmaWeights(const double lambda, const int n_aug);
+
+
+/*
  * Predict gaussian using predicted sigma points
  */
-Gaussian PredictGaussian(const Eigen::MatrixXd &Xsig_pred, const double lambda, const int n_aug);
+Gaussian PredictGaussian(const Eigen::VectorXd &weights, const Eigen::MatrixXd &Xsig_pred);
 
 #endif

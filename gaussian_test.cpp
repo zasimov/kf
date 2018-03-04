@@ -109,7 +109,8 @@ namespace {
       0.5367, 0.47338, 0.67809, 0.55455, 0.64364, 0.54337, 0.5367, 0.53851, 0.60017, 0.39546, 0.51900, 0.42991, 0.530188, 0.5367, 0.535048,
       0.352, 0.29997, 0.46212, 0.37633, 0.4841, 0.41872, 0.352, 0.38744, 0.40562, 0.24347, 0.32926, 0.2214, 0.28687, 0.352, 0.318159;
 
-    const Gaussian g = PredictGaussian(Xsig_pred, STDLAMBDA(n_aug), n_aug);
+    const Eigen::VectorXd weights = CalculateSigmaWeights(STDLAMBDA(n_aug), n_aug);
+    const Gaussian g = PredictGaussian(weights, Xsig_pred);
 
     Eigen::VectorXd expected_x(n_x);
     expected_x <<  5.93637, 1.49035, 2.20528, 0.536853, 0.353577;
