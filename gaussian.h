@@ -17,6 +17,10 @@ struct Gaussian {
 };
 
 
+
+#define STDLAMBDA(n_x) (3 - (n_x))
+
+
 /*
  * CalculateSigmaPoints returns (n, 2n + 1) matrix where n is a size of `x_` vector.
  *

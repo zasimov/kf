@@ -1,4 +1,3 @@
-#include <iostream>
 #include <cmath>
 #include <Eigen/Dense>
 
@@ -27,7 +26,7 @@ namespace {
       -0.0022, 0.0071, 0.0007, 0.0098, 0.0100,
       -0.0020, 0.0060, 0.0008, 0.0100, 0.0123;
 
-    const double lambda = 3 - n_x;
+    const double lambda = STDLAMBDA(n_x);
 
     const Eigen::MatrixXd sigma_points = CalculateSigmaPoints(lambda, x, P);
 
@@ -41,12 +40,7 @@ namespace {
     ASSERT_EQ(sigma_points.rows(), sigma_points.rows());
     ASSERT_EQ(sigma_points.cols(), sigma_points.cols());
 
-    std::cout << sigma_points << std::endl << std::endl;
-    std::cout << expected << std::endl << std::endl;
-    std::cout << sigma_points - expected << std::endl;
-
     ASSERT_TRUE(sigma_points.isApprox(expected, 1e-6));
-
   }
   
 }
