@@ -23,3 +23,27 @@ Eigen::MatrixXd CalculateSigmaPoints(const double lambda, const Eigen::VectorXd 
 
   return Xsig;
 }
+
+
+Gaussian AugmentGaussian(const Gaussian &g, const Eigen::VectorXd stdv) {
+  Eigen::VectorXd xaug(g.x_.size() + stdv.size());
+  Eigen::MatrixXd Paug(xaug.size(), xaug.size());
+
+  xaug.head(g.x_.size()) = g.x_;
+  for(unsigned i = g.x_.size(); i < xaug.size(); i++) {
+    xaug(i) = 0;
+  }
+
+  Paug.fill(0);
+  Paug.topLeftCorner(g.x_.size(), g.x_.size()) = g.P_;
+  for(unsigned i = g.x_.size(); i < xaug.size(); i++) {
+    Paug(i, i) = stdv(i - g.x_.size()) * stdv(i - g.x_.size());
+  }
+
+  Gaussian g2(xaug.size());
+  g2.x_ = xaug;
+  g2.P_ = Paug;
+  g2.is_initialized_ = true;
+
+  return g2;
+}

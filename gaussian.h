@@ -28,4 +28,12 @@ struct Gaussian {
  */
 Eigen::MatrixXd CalculateSigmaPoints(double lambda, const Eigen::VectorXd &x, const Eigen::MatrixXd &P);
 
+/*
+ * Augment gaussian `g`
+ *
+ * `stdv` - process noise vector (standard deviations)
+ *
+ */
+Gaussian AugmentGaussian(const Gaussian &g, const Eigen::VectorXd stdv);
+
 #endif
