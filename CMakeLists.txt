@@ -46,10 +46,14 @@ IF (GTEST_FOUND)
    add_executable(testgaussian gaussian.cpp gaussian_test.cpp)
    target_link_libraries(testgaussian ${GTEST_BOTH_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT} ${M_LIBRARY})
 
+   add_executable(testctrv ctrv.cpp math.cpp logging.cpp ctrv_test.cpp)
+   target_link_libraries(testctrv ${GTEST_BOTH_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT} ${M_LIBRARY})
+
    add_test(NAME parser COMMAND testparser)
    add_test(NAME matrices COMMAND testmatrices)
    add_test(NAME math COMMAND testmath)
    add_test(NAME gaussian COMMAND testgaussian)
+   add_test(NAME ctrv COMMAND testctrv)
 ENDIF(GTEST_FOUND)
 
 add_executable(testfile parser.cpp testfile.cpp)

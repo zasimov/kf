@@ -93,7 +93,7 @@ namespace {
       0, 0, 0, 0, 0, 0, 0.34641, 0, 0, 0, 0, 0, 0, -0.34641, 0,
       0, 0, 0, 0, 0, 0, 0, 0.34641, 0, 0, 0, 0, 0, 0, -0.34641;
 
-    ASSERT_TRUE(sigma_points.isApprox(expected, 1e-2));   
+    ASSERT_TRUE(sigma_points.isApprox(expected, 1e-6));   
   }
   
   
