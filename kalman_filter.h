@@ -10,8 +10,8 @@
 
 class AbstractKalmanFilter {
  public:
-  AbstractKalmanFilter(std::shared_ptr<Gaussian> state,
-		       const Eigen::MatrixXd &R);
+
+  AbstractKalmanFilter(std::shared_ptr<Gaussian> state);
 
   virtual ~AbstractKalmanFilter() {
   }
@@ -20,7 +20,6 @@ class AbstractKalmanFilter {
    * Should be called once (with first measurement).
    */
   virtual void Init(const Eigen::VectorXd &z) = 0;
-
 
   /**
    * Predict implements "Predict" step.
@@ -32,19 +31,34 @@ class AbstractKalmanFilter {
    * Predict changes `x_` and `P_`. `x_` fill contain prediction for (t + 1)
    *
    */
-  const Eigen::VectorXd& Predict(const Eigen::MatrixXd &F, const Eigen::MatrixXd &Q, const Eigen::VectorXd &u);
+  virtual const Eigen::VectorXd& Predict(const Eigen::MatrixXd &F, const Eigen::MatrixXd &Q, const Eigen::VectorXd &u) = 0;
 
   /**
    * Update implements "Update" step"
    *
    *  z is a measurement vector.
    */
-  void Update(const Eigen::VectorXd &z);
+  virtual void Update(const Eigen::VectorXd &z) = 0;
 
   /**
    * GetEstimate returns current estimate of state.
    */
   const Eigen::VectorXd& GetEstimate() const;
+
+
+ protected:
+  std::shared_ptr<Gaussian> state_;
+};
+
+
+class SimpleKalmanFilter: public AbstractKalmanFilter {
+ public:
+  SimpleKalmanFilter(std::shared_ptr<Gaussian> state,
+		     const Eigen::MatrixXd &R);
+
+  virtual const Eigen::VectorXd& Predict(const Eigen::MatrixXd &F, const Eigen::MatrixXd &Q, const Eigen::VectorXd &u);
+
+  virtual void Update(const Eigen::VectorXd &z);
 
  protected:
   /**
@@ -57,17 +71,14 @@ class AbstractKalmanFilter {
    */
   virtual Eigen::VectorXd GetY(const Eigen::VectorXd &z) const = 0;
 
- protected:
-  std::shared_ptr<Gaussian> state_;
-
  private:
-  Eigen::MatrixXd R_;  // measurement covariance matrix
+  Eigen::MatrixXd R_;  // measurement noise matrix
 
   Eigen::MatrixXd I_;  // identity matrix
 };
 
 
-class LinearKalmanFilter : public AbstractKalmanFilter {
+class LinearKalmanFilter : public SimpleKalmanFilter {
  public:
   LinearKalmanFilter(std::shared_ptr<Gaussian> state,
 		     const Eigen::MatrixXd &R,
@@ -85,7 +96,7 @@ class LinearKalmanFilter : public AbstractKalmanFilter {
 };
 
 
-class ExtendedKalmanFilter : public AbstractKalmanFilter {
+class ExtendedKalmanFilter : public SimpleKalmanFilter {
  public:
   ExtendedKalmanFilter(std::shared_ptr<Gaussian> state,
 		       const Eigen::MatrixXd &R);

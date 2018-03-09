@@ -5,23 +5,34 @@
 #include "math.h"
 
 
-AbstractKalmanFilter::AbstractKalmanFilter(std::shared_ptr<Gaussian> state,
-					   const Eigen::MatrixXd &R):
-  state_(state), R_(R) {
+AbstractKalmanFilter::AbstractKalmanFilter(std::shared_ptr<Gaussian> state):
+  state_(state) {
+  // nothing to do
+}
+
+
+const Eigen::VectorXd& AbstractKalmanFilter::GetEstimate() const {
+  return state_->x_;
+}
+
+
+SimpleKalmanFilter::SimpleKalmanFilter(std::shared_ptr<Gaussian> state,
+				       const Eigen::MatrixXd &R):
+  AbstractKalmanFilter(state), R_(R) {
 
   I_ = Eigen::MatrixXd::Identity(state_->x_.size(),
 				 state_->x_.size());
 }
 
 
-const Eigen::VectorXd& AbstractKalmanFilter::Predict(const Eigen::MatrixXd &F, const Eigen::MatrixXd &Q, const Eigen::VectorXd &u) {
+const Eigen::VectorXd& SimpleKalmanFilter::Predict(const Eigen::MatrixXd &F, const Eigen::MatrixXd &Q, const Eigen::VectorXd &u) {
   state_->x_ = F * state_->x_ + u;
   state_->P_ = F * state_->P_ * F.transpose() + Q;
   return state_->x_;
 }
 
 
-void AbstractKalmanFilter::Update(const Eigen::VectorXd &z) {
+void SimpleKalmanFilter::Update(const Eigen::VectorXd &z) {
   const Eigen::VectorXd y = GetY(z);
 
   const Eigen::MatrixXd H = GetH();
@@ -35,15 +46,10 @@ void AbstractKalmanFilter::Update(const Eigen::VectorXd &z) {
 }
 
 
-const Eigen::VectorXd& AbstractKalmanFilter::GetEstimate() const {
-  return state_->x_;
-}
-
-
 LinearKalmanFilter::LinearKalmanFilter(std::shared_ptr<Gaussian> state,
 				       const Eigen::MatrixXd &R,
 				       const Eigen::MatrixXd &H)
-  : AbstractKalmanFilter(state, R), H_(H) {
+  : SimpleKalmanFilter(state, R), H_(H) {
 }
 
 
@@ -68,7 +74,7 @@ Eigen::VectorXd LinearKalmanFilter::GetY(const Eigen::VectorXd &z) const {
 
 ExtendedKalmanFilter::ExtendedKalmanFilter(std::shared_ptr<Gaussian> state,
 					   const Eigen::MatrixXd &R)
-  : AbstractKalmanFilter(state, R) {
+  : SimpleKalmanFilter(state, R) {
 
 }
 
