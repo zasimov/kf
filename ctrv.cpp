@@ -93,5 +93,5 @@ Eigen::VectorXd CtrvLazerMeasurementModel(const Eigen::VectorXd &x) {
 
   z << x(0), x(1);
 
-  return x;
+  return z;
 }

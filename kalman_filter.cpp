@@ -1,4 +1,5 @@
 #include <cassert>
+#include <iostream>
 
 #include "ctrv.h"
 #include "gaussian.h"
@@ -12,6 +13,9 @@ AbstractKalmanFilter::AbstractKalmanFilter(std::shared_ptr<Gaussian> state):
 }
 
 
+/*
+ * Simple Kalman Filter (the base for LinearKalmanFilter and ExtendedKalmanFilter)
+ */
 SimpleKalmanFilter::SimpleKalmanFilter(std::shared_ptr<Gaussian> state,
 				       const Eigen::MatrixXd &R):
   AbstractKalmanFilter(state), R_(R) {
@@ -85,6 +89,10 @@ const Eigen::MatrixXd SimpleKalmanFilter::GetQ(const double dt) const {
 }
 
 
+/*
+ * LinearKalmanFilter (aka Kalman Filter)
+ */
+
 LinearKalmanFilter::LinearKalmanFilter(std::shared_ptr<Gaussian> state,
 				       const Eigen::MatrixXd &R,
 				       const Eigen::MatrixXd &H)
@@ -110,6 +118,10 @@ Eigen::VectorXd LinearKalmanFilter::GetY(const Eigen::VectorXd &z) const {
   return z - H_ * state_->x_;
 }
 
+
+/*
+ * ExtendedKalmanFilter (EKF)
+ */
 
 ExtendedKalmanFilter::ExtendedKalmanFilter(std::shared_ptr<Gaussian> state,
 					   const Eigen::MatrixXd &R)
@@ -142,9 +154,14 @@ Eigen::VectorXd ExtendedKalmanFilter::GetY(const Eigen::VectorXd &z) const {
 }
 
 
+/*
+ * CtrvUnscendedKalmanFilter
+ */
+
 CtrvUnscendedKalmanFilter::CtrvUnscendedKalmanFilter(std::shared_ptr<Gaussian> state, const Eigen::VectorXd &stdv, const Eigen::MatrixXd &R)
   : AbstractKalmanFilter(state), stdv_(stdv), R_(R) {
 
+  Q_ = Eigen::MatrixXd(stdv_.size(), stdv_.size());
   // calculate Q_ matrix
   Q_.fill(0.0);
   for (unsigned i = 0; i < stdv_.size(); i++) {
@@ -186,7 +203,7 @@ void CtrvUnscendedKalmanFilter::Update(const Eigen::VectorXd &z) {
 
   // map predicted sigma points from state space to measurement space
   for (unsigned i = 0; i < Xsig_pred_.cols(); i++) {
-    Zsig_pred.col(i) = MapXtoZ(Xsig_pred_.col(i));
+    Zsig_pred.col(i) = MapXtoZ(Xsig_pred_.col(i));;
   }
 
   // calculate predicted gaussian
@@ -241,6 +258,9 @@ Eigen::MatrixXd CtrvUnscendedKalmanFilter::CalculateCrosscorrelationMatrix(const
 }
 
 
+/*
+ * LazerUKF
+ */
 void LazerUKF::Init(const Eigen::VectorXd &z) {
   // the same as in LinearKalmanFilter
 
@@ -267,6 +287,9 @@ Eigen::VectorXd LazerUKF::MapXtoZ(const Eigen::VectorXd &x) const {
 }
 
 
+/*
+ * RadarUKF
+ */
 void RadarUKF::Init(const Eigen::VectorXd &z) {
   // the same as in EKF
   assert(z.size() == 3);

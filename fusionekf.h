@@ -1,7 +1,8 @@
 #ifndef __FUSIONEKF_H
 #define __FUSIONEKF_H
 
-
+#include <cmath>
+#include <iostream>
 #include <memory>
 
 #include <Eigen/Dense>
@@ -47,7 +48,7 @@ class Fusion {
   /**
    * Process processes measurement and returns estimate.
    */
-  const Eigen::VectorXd& ProcessMeasurement(const struct measurement &m, const Eigen::VectorXd &u);
+  const Eigen::VectorXd ProcessMeasurement(const struct measurement &m, const Eigen::VectorXd &u);
 
   /**
    * Reset state_
@@ -83,6 +84,11 @@ class Fusion {
    */
   Eigen::VectorXd GetZ(const struct measurement &m) const;
 
+  /*
+   * Convert state vector to estimate vector
+   */
+  virtual Eigen::VectorXd ToEstimate(const Eigen::VectorXd &x) const = 0;
+
  protected:
   std::shared_ptr<Gaussian> state_;  // kalman filter shared state
   Clock clock_;
@@ -117,6 +123,9 @@ class FusionEKF: public LazerRadarFusion {
 
   void ResetState();
 
+ protected:
+  Eigen::VectorXd ToEstimate(const Eigen::VectorXd &x) const;
+
  private:
   // matrices
   Eigen::MatrixXd F_;
@@ -127,9 +136,10 @@ class FusionUKF: public LazerRadarFusion {
  public:
   FusionUKF();
 
-  bool Init(const struct measurement &m);
-
   void ResetState();
+
+ protected:
+  Eigen::VectorXd ToEstimate(const Eigen::VectorXd &x) const;
 };
 
 

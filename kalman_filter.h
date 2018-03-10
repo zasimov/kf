@@ -198,10 +198,10 @@ class CtrvUnscendedKalmanFilter : public AbstractKalmanFilter {
 
  protected:
   double lambda_;
-  Eigen::VectorXd stdv_;
+  const Eigen::VectorXd stdv_;
   Eigen::MatrixXd Q_;   // calculated by `stdv_`
   Eigen::VectorXd weights_;  // const
-  Eigen::MatrixXd R_;  // measurement noise
+  const Eigen::MatrixXd R_;  // measurement noise
 
  private:
   Eigen::MatrixXd Xsig_pred_;  // predicted sigma points, `Predict` calculates Xsig_pred_ and `Update` uses.

@@ -36,11 +36,11 @@ int main() {
   std::vector<Eigen::VectorXd> estimations;
   std::vector<Eigen::VectorXd> ground_truth;
 
-  FusionEKF fusion;
+  FusionUKF fusion;
 
   // fake control vector
-  Eigen::VectorXd u(4);
-  u << 0.0, 0.0, 0.0, 0.0;
+  Eigen::VectorXd u(5);
+  u << 0.0, 0.0, 0.0, 0.0, 0.0;
 
 
   if (! hub.listen(kListenPort)) {

@@ -36,9 +36,9 @@ Fusion::Fusion(std::shared_ptr<Gaussian> state)
 }
 
 
-const Eigen::VectorXd& Fusion::ProcessMeasurement(const struct measurement &m, const Eigen::VectorXd &u) {
+const Eigen::VectorXd Fusion::ProcessMeasurement(const struct measurement &m, const Eigen::VectorXd &u) {
   if (Init(m)) {
-    return state_->x_;
+    return ToEstimate(state_->x_);
   }
 
   std::shared_ptr<AbstractKalmanFilter> filter = ChooseFilter(m);
@@ -49,7 +49,7 @@ const Eigen::VectorXd& Fusion::ProcessMeasurement(const struct measurement &m, c
   Eigen::VectorXd z = GetZ(m);
   filter->Update(z);
 
-  return state_->x_;
+  return ToEstimate(state_->x_);
 }
 
 
@@ -155,6 +155,11 @@ void FusionEKF::ResetState() {
 }
 
 
+Eigen::VectorXd FusionEKF::ToEstimate(const Eigen::VectorXd &x) const {
+  Eigen::VectorXd estimate(x);
+  return estimate;
+}
+
 
 FusionUKF::FusionUKF()
   : LazerRadarFusion(std::make_shared<Gaussian>(5)) {
@@ -196,10 +201,6 @@ FusionUKF::FusionUKF()
 }
 
 
-bool FusionUKF::Init(const struct measurement &m) {
-}
-
-
 void FusionUKF::ResetState() {
   state_->x_ << 1, 1, 1, 1, 1;
 
@@ -212,4 +213,18 @@ void FusionUKF::ResetState() {
   state_->is_initialized_ = false;
 
   clock_.Init(0);
+}
+
+
+Eigen::VectorXd FusionUKF::ToEstimate(const Eigen::VectorXd &x) const {
+    Eigen::VectorXd estimate(4);
+
+    const double px = x(0);
+    const double py = x(1);
+    const double v  = x(2);
+    const double yaw = x(3);
+
+    estimate << px, py, cos(yaw) * v, sin(yaw) * v;
+
+    return estimate;
 }
