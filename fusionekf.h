@@ -31,36 +31,31 @@ private:
 };
 
 
-class FusionEKF {
- public:
-  FusionEKF();
+class Fusion {
+ protected:
+  Fusion(std::shared_ptr<Gaussian> state);
 
+ public:
   /**
    * Init initializes Kalman State and Clock.
    *
    * Returns true if pipeline is initializes on current step.
    *
    */
-  bool Init(const struct measurement &m);
+  virtual bool Init(const struct measurement &m) = 0;
 
   /**
    * Process processes measurement and returns estimate.
    */
-  const Eigen::VectorXd& ProcessMeasurement(const struct measurement &m);
-
-  /**
-   * GetEstimate returns current estimation of state.
-   */
-  const Eigen::VectorXd GetEstimate() const;
-
-  std::shared_ptr<Gaussian> GetState() const {
-    return state_;
-  }
+  const Eigen::VectorXd& ProcessMeasurement(const struct measurement &m, const Eigen::VectorXd &u);
 
   /**
    * Reset state_
+   *
+   * uWS server calls this method when client is connected
+   *
    */
-  void ResetState();
+  virtual void ResetState() = 0;
 
   /**
    * Print kalman filter state (for debug purposes).
@@ -68,40 +63,73 @@ class FusionEKF {
 
   void PrintState() const;
 
+  std::shared_ptr<Gaussian> GetState() const {
+    return state_;
+  }
+
   std::string NowStr() const {
     return clock_.NowStr();
   }
 
- private:
+ protected:
   /**
    * ChooseFilter chooses appropriate filter.
    */
-  std::shared_ptr<AbstractKalmanFilter> ChooseFilter(const struct measurement &m) const;
+  virtual std::shared_ptr<AbstractKalmanFilter> ChooseFilter(const struct measurement &m) const = 0;
+
 
   /**
    * GetZ converts measurement to Eigen vector.
    */
   Eigen::VectorXd GetZ(const struct measurement &m) const;
 
- private:
-  struct std::shared_ptr<Gaussian> state_;
+ protected:
+  std::shared_ptr<Gaussian> state_;  // kalman filter shared state
   Clock clock_;
+};
 
-  // matrices
 
-  /*
-   *   px' = 1 * px + 0 * py +  dt * vx + 0 * vy
-   *   py' = 0 * px + 1 * py +  0 * vx + dt * vy
-   *   vx' = 0 * px + 0 * py +  1 * vx + 0 * vy
-   *   vy' = 0 * px + 0 * py +  0 * vx + 1 * vy
+
+class LazerRadarFusion: public Fusion {
+ public:
+  bool Init(const struct measurement &m);
+
+ protected:
+  LazerRadarFusion(std::shared_ptr<Gaussian> state)
+    : Fusion(state) {
+  }
+
+  /**
+   * ChooseFilter chooses appropriate filter.
    */
+  std::shared_ptr<AbstractKalmanFilter> ChooseFilter(const struct measurement &m) const;
+
+ protected:
+  // child must initialize these fields
+  std::shared_ptr<AbstractKalmanFilter> lazer_filter_;
+  std::shared_ptr<AbstractKalmanFilter> radar_filter_;
+};
+
+
+class FusionEKF: public LazerRadarFusion {
+ public:
+  FusionEKF();
+
+  void ResetState();
+
+ private:
+  // matrices
   Eigen::MatrixXd F_;
+};
 
-  // control vector
-  Eigen::VectorXd u_;
 
-  std::shared_ptr<LinearKalmanFilter> lazer_filter_;
-  std::shared_ptr<ExtendedKalmanFilter> radar_filter_;
+class FusionUKF: public LazerRadarFusion {
+ public:
+  FusionUKF();
+
+  bool Init(const struct measurement &m);
+
+  void ResetState();
 };
 
 

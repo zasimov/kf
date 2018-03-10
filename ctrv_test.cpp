@@ -3,6 +3,7 @@
 
 #include "ctrv.h"
 #include "gaussian.h"
+#include "math.h"
 
 #include <gtest/gtest.h>
 
@@ -53,17 +54,17 @@ namespace {
       0.5367, 0.47338, 0.67809, 0.55455, 0.64364, 0.54337,  0.5367, 0.53851, 0.60017, 0.39546, 0.51900, 0.42991, 0.530188,  0.5367, 0.535048,
       0.352, 0.29997, 0.46212, 0.37633,  0.4841, 0.41872,   0.352, 0.38744, 0.40562, 0.24347, 0.32926,  0.2214, 0.28687,   0.352, 0.318159;
 
-    const Eigen::MatrixXd R = CtrvMeasurementNoise(0.3, 0.0175, 0.1);
+    const Eigen::MatrixXd R = CtrvRadarMeasurementNoise(0.3, 0.0175, 0.1);
 
     const Eigen::MatrixXd weights = CalculateSigmaWeights(STDLAMBDA(n_aug), n_aug);
 
     Eigen::MatrixXd Zsig_pred(n_z, Xsig_pred.cols());
 
     for (unsigned i = 0; i < Xsig_pred.cols(); i++) {
-      Zsig_pred.col(i) = CtrvMeasurementModel(Xsig_pred.col(i));
+      Zsig_pred.col(i) = CtrvRadarMeasurementModel(Xsig_pred.col(i));
     }
 
-    Gaussian zg = PredictGaussian(weights, Zsig_pred, 1);
+    Gaussian zg = PredictGaussian(weights, Zsig_pred, [](Eigen::VectorXd &df) { df(1) = NormalizeAngle(df(1)); });
 
     // add noise
     zg.P_ = zg.P_ + R;

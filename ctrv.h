@@ -6,7 +6,8 @@
 
 static const int kCtrvStateDim = 5;
 static const int kCtrvAugStateDim = 7;
-static const int kCtrvZDim = 3;
+static const int kCtrvRadarZDim = 3;
+static const int kCtrvLazerZDim = 2;
 
 
 /*
@@ -22,7 +23,7 @@ Eigen::VectorXd CtrvProcessModel(const Eigen::VectorXd &x_aug, const double dt);
 /*
  * Map sigma point to measurement space.
  */
-Eigen::VectorXd CtrvMeasurementModel(const Eigen::VectorXd &x);
+Eigen::VectorXd CtrvRadarMeasurementModel(const Eigen::VectorXd &x);
 
 /*
  * Calculate measurement noise matrix
@@ -32,7 +33,14 @@ Eigen::VectorXd CtrvMeasurementModel(const Eigen::VectorXd &x);
  * std_radrd - radar measurement noise standard deviation radius change in m/s
  *
  */
-Eigen::MatrixXd CtrvMeasurementNoise(const double std_radr, const double std_radphi, const double std_radrd);
+Eigen::MatrixXd CtrvRadarMeasurementNoise(const double std_radr, const double std_radphi, const double std_radrd);
+
+
+/*
+ * Map a state vector to measurement vector (for Lazer)
+ */
+Eigen::VectorXd CtrvLazerMeasurementModel(const Eigen::VectorXd &x);
+
 
 
 #endif

@@ -3,6 +3,7 @@
 #include <Eigen/Dense>
 
 #include "gaussian.h"
+#include "math.h"
 
 #include <gtest/gtest.h>
 
@@ -76,7 +77,12 @@ namespace {
     Eigen::VectorXd stdv(2);
     stdv << std_a, std_yawdd;
 
-    Gaussian gaug = AugmentGaussian(g, stdv);
+    Eigen::MatrixXd Q(2, 2);
+    Q.fill(0.0);
+    Q(0, 0) = stdv(0) * stdv(0);
+    Q(1, 1) = stdv(1) * stdv(1);
+
+    Gaussian gaug = AugmentGaussian(g, Q);
 
     Eigen::MatrixXd sigma_points = CalculateSigmaPoints(STDLAMBDA(gaug.x_.size()), gaug.x_, gaug.P_);
 
@@ -110,7 +116,7 @@ namespace {
       0.352, 0.29997, 0.46212, 0.37633, 0.4841, 0.41872, 0.352, 0.38744, 0.40562, 0.24347, 0.32926, 0.2214, 0.28687, 0.352, 0.318159;
 
     const Eigen::VectorXd weights = CalculateSigmaWeights(STDLAMBDA(n_aug), n_aug);
-    const Gaussian g = PredictGaussian(weights, Xsig_pred, 3);
+    const Gaussian g = PredictGaussian(weights, Xsig_pred, [](Eigen::VectorXd &df) { df(3) = NormalizeAngle(df(3)); });
 
     Eigen::VectorXd expected_x(n_x);
     expected_x <<  5.93637, 1.49035, 2.20528, 0.536853, 0.353577;

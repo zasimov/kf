@@ -1,6 +1,7 @@
 #ifndef __GAUSSIAN_H
 #define __GAUSSIAN_H
 
+#include <functional>
 
 #include <Eigen/Dense>
 
@@ -13,6 +14,13 @@ struct Gaussian {
 
   Gaussian(unsigned x_size)
   : x_(x_size), P_(x_size, x_size), is_initialized_(false) {
+  }
+
+  /*
+   * Return a dimension of state space.
+   */
+  unsigned GetNx() const {
+    return x_.size();
   }
 };
 
@@ -28,13 +36,14 @@ struct Gaussian {
  */
 Eigen::MatrixXd CalculateSigmaPoints(double lambda, const Eigen::VectorXd &x, const Eigen::MatrixXd &P);
 
+
 /*
  * Augment gaussian `g`
  *
  * `stdv` - process noise vector (standard deviations)
  *
  */
-Gaussian AugmentGaussian(const Gaussian &g, const Eigen::VectorXd &stdv);
+Gaussian AugmentGaussian(const Gaussian &g, const Eigen::MatrixXd &Q);
 
 
 /*
@@ -52,6 +61,8 @@ Eigen::VectorXd CalculateSigmaWeights(const double lambda, const int n_aug);
  *   1 for ctrv measurement model
  *
  */
-Gaussian PredictGaussian(const Eigen::VectorXd &weights, const Eigen::MatrixXd &Xsig_pred, const unsigned angle_idx);
+Gaussian PredictGaussian(const Eigen::VectorXd &weights,
+			 const Eigen::MatrixXd &Xsig_pred,
+			 std::function<void(Eigen::VectorXd&)> norm_df);
 
 #endif

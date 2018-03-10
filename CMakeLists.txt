@@ -21,11 +21,11 @@ find_library(UV_LIBRARY NAMES uv)
 find_library(UWS_LIBRARY NAMES uWS PATHS ${UWS_LIB_PATH} NO_DEFAULT_PATH)
 find_library(M_LIBRARY NAMES m)
 
-add_executable(ekf main.cpp math.cpp parser.cpp protocol.cpp logging.cpp kalman_filter.cpp matrices.cpp fusionekf.cpp)
+add_executable(ekf main.cpp gaussian.cpp math.cpp parser.cpp protocol.cpp logging.cpp kalman_filter.cpp fusionekf.cpp ctrv.cpp)
 set_property(TARGET ekf PROPERTY CXX_STANDARD 11)
 target_link_libraries(ekf ${UV_LIBRARY} ${UWS_LIBRARY} ${ZLIB_LIBRARIES} ${OPENSSL_LIBRARIES})
 
-add_executable(objpose objpose.cpp math.cpp parser.cpp logging.cpp kalman_filter.cpp matrices.cpp fusionekf.cpp)
+add_executable(objpose objpose.cpp gaussian.cpp math.cpp parser.cpp logging.cpp kalman_filter.cpp fusionekf.cpp ctrv.cpp)
 set_property(TARGET objpose PROPERTY CXX_STANDARD 11)
 
 find_package(GTest)
@@ -37,9 +37,6 @@ IF (GTEST_FOUND)
    # FIXME: -lpthread and -lm is required for Linux only
    target_link_libraries(testparser ${GTEST_BOTH_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT} ${M_LIBRARY})
 
-   add_executable(testmatrices matrices.cpp matrices_test.cpp)
-   target_link_libraries(testmatrices ${GTEST_BOTH_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT} ${M_LIBRARY})
-
    add_executable(testmath math.cpp logging.cpp math_test.cpp)
    target_link_libraries(testmath ${GTEST_BOTH_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT} ${M_LIBRARY})
 
@@ -49,11 +46,14 @@ IF (GTEST_FOUND)
    add_executable(testctrv ctrv.cpp math.cpp logging.cpp gaussian.cpp ctrv_test.cpp)
    target_link_libraries(testctrv ${GTEST_BOTH_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT} ${M_LIBRARY})
 
+   add_executable(testmp measurement_package_test.cpp)
+   target_link_libraries(testmp ${GTEST_BOTH_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT} ${M_LIBRARY})
+
    add_test(NAME parser COMMAND testparser)
-   add_test(NAME matrices COMMAND testmatrices)
    add_test(NAME math COMMAND testmath)
    add_test(NAME gaussian COMMAND testgaussian)
    add_test(NAME ctrv COMMAND testctrv)
+   add_test(NAME mp COMMAND testmp)
 ENDIF(GTEST_FOUND)
 
 add_executable(testfile parser.cpp testfile.cpp)

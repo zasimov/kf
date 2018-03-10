@@ -8,6 +8,12 @@
 #include "math.h"
 
 
+/*
+ * CtrvProcessModel calculates `x_pred` using augmented `x_aug` and `dt`.
+ *
+ * You can use this function to calculate prediced sigma points.
+ *
+ */
 Eigen::VectorXd CtrvProcessModel(const Eigen::VectorXd &x_aug, const double dt) {
   Eigen::VectorXd x_pred(kCtrvStateDim);
 
@@ -48,7 +54,13 @@ Eigen::VectorXd CtrvProcessModel(const Eigen::VectorXd &x_aug, const double dt) 
 }
 
 
-Eigen::VectorXd CtrvMeasurementModel(const Eigen::VectorXd &x) {
+/*
+ * You can use this function to calculate sigma points in measurement space.
+ *
+ * Do not forget about `CtrvRadarMeasurementNoise`.
+ *
+ */
+Eigen::VectorXd CtrvRadarMeasurementModel(const Eigen::VectorXd &x) {
   const double px = x(0);
   const double py = x(1);
   const double v  = x(2);
@@ -57,7 +69,7 @@ Eigen::VectorXd CtrvMeasurementModel(const Eigen::VectorXd &x) {
   const double v1 = cos(yaw) * v;
   const double v2 = sin(yaw) * v;
 
-  Eigen::VectorXd z(kCtrvZDim);
+  Eigen::VectorXd z(kCtrvRadarZDim);
   z(0) = sqrt(px * px + py * py);                        //r
   // FIXME: check atan2(0, 0)
   z(1) = atan2(py, px);                                  //phi
@@ -67,10 +79,19 @@ Eigen::VectorXd CtrvMeasurementModel(const Eigen::VectorXd &x) {
 }
 
 
-Eigen::MatrixXd CtrvMeasurementNoise(const double std_radr, const double std_radphi, const double std_radrd) {
-  Eigen::MatrixXd R(kCtrvZDim, kCtrvZDim);
+Eigen::MatrixXd CtrvRadarMeasurementNoise(const double std_radr, const double std_radphi, const double std_radrd) {
+  Eigen::MatrixXd R(kCtrvRadarZDim, kCtrvRadarZDim);
   R << std_radr * std_radr, 0, 0,
     0, std_radphi * std_radphi, 0,
     0, 0, std_radrd * std_radrd;
   return R;
+}
+
+
+Eigen::VectorXd CtrvLazerMeasurementModel(const Eigen::VectorXd &x) {
+  Eigen::VectorXd z(kCtrvLazerZDim);
+
+  z << x(0), x(1);
+
+  return x;
 }

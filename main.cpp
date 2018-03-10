@@ -14,7 +14,6 @@
 #include "kalman_filter.h"
 #include "logging.h"
 #include "math.h"
-#include "matrices.h"
 #include "measurement_package.h"
 #include "protocol.h"
 
@@ -38,6 +37,10 @@ int main() {
   std::vector<Eigen::VectorXd> ground_truth;
 
   FusionEKF fusion;
+
+  // fake control vector
+  Eigen::VectorXd u(4);
+  u << 0.0, 0.0, 0.0, 0.0;
 
 
   if (! hub.listen(kListenPort)) {
@@ -65,7 +68,7 @@ int main() {
   /**
    * Fusion!!!
    */
-  hub.onMessage([&fusion, &estimations, &ground_truth]
+  hub.onMessage([&fusion, &estimations, &ground_truth, &u]
 		(uWS::WebSocket<uWS::SERVER> *ws, char *data, size_t length, uWS::OpCode opCode) {
        struct measurement m;
        struct ground_truth g;
@@ -89,7 +92,7 @@ int main() {
 
        std::cout << "*** Process measurement: " << m.sensor_type << std::endl;
 
-       Eigen::VectorXd estimate = fusion.ProcessMeasurement(m);
+       Eigen::VectorXd estimate = fusion.ProcessMeasurement(m, u);
        Eigen::VectorXd gtv = GetGroundTruthVector(g);
 
        estimations.push_back(estimate);

@@ -36,6 +36,10 @@ Eigen::VectorXd GetGroundTruthVector(const struct ground_truth &g) {
 void test_file_or_die(char *filename) {
   FusionEKF fusion;
 
+  // fake control vector
+  Eigen::VectorXd u(4);
+  u << 0.0, 0.0, 0.0, 0.0;
+
   std::vector<Eigen::VectorXd> estimations;
   std::vector<Eigen::VectorXd> ground_truth;
 
@@ -59,7 +63,7 @@ void test_file_or_die(char *filename) {
       continue;
     }
 
-    const Eigen::VectorXd &estimate = fusion.ProcessMeasurement(m);
+    const Eigen::VectorXd &estimate = fusion.ProcessMeasurement(m, u);
     Eigen::VectorXd gtv = GetGroundTruthVector(g);
 
     estimations.push_back(estimate);
