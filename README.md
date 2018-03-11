@@ -151,20 +151,20 @@ UKF fusion pipeline is more compilcated. Please see
 
      * `CalculateSigmaPoints` calculates sigma points
 
-	 * `AugmentGaussian` builds augmented gaussian using `Q` matrix
+     * `AugmentGaussian` builds an augmented gaussian using `Q` matrix
 
-	 * `CalculateSigmaWeights` calculates `weights`
+     * `CalculateSigmaWeights` calculates `weights`
 
-	 * `PredictGaussian` "restores" a gaussian by predicted sigma
+     * `PredictGaussian` "restores" a gaussian by predicted sigma
        points. `PredictGaussian` uses an external function to
        normalize angles.
 
-  * `fusionukf` implements `FusionUKF` class (it is base on
+  * `fusionukf` implements `FusionUKF` class (that is based on
     `LazerRadarFusion`). `FusionUKF` initializes `R_radar` and
     `R_lazer` matrices and creates `LazerUKF` and `RadarUKF`
     instances.
 
-	 * for radar
+     * for radar
 	     * `std(rho) = 0.3`
          * `std(phi) = 0.03`
          * `std(rho_dot) = 0.3`
@@ -173,7 +173,7 @@ UKF fusion pipeline is more compilcated. Please see
 	     * `std(px) = 0.15`
 	     * `std(py) = 0.15`
 
-	 * Q matrix (process noise)
+     * Q matrix (process noise)
 	     * `std(a) = 0.2` - longitudinal acceleration
 		 * `std(yawdd) = 0.2` - yaw acceleration
 
@@ -183,7 +183,7 @@ UKF fusion pipeline is more compilcated. Please see
     `CtrvUnscendedKalmanFilter` class which implements whole
     `Predict` and `Update` pipeline. `LazerUKF` and `RadarUKF`
     implement additional initialization logic, normalization logic and
-    equation `MapXtoZ` `Update` method uses `MapXtoZ` to calculate
+    equation `MapXtoZ`. `Update` method uses `MapXtoZ` to calculate
     predicted sigma points in measurement space.
 
 ### json.hpp
