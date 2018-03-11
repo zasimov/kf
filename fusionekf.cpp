@@ -116,13 +116,15 @@ std::shared_ptr<AbstractKalmanFilter> LazerRadarFusion::ChooseFilter(const struc
 
 // 4 is a dimension of state space
 FusionEKF::FusionEKF()
-  : LazerRadarFusion(std::make_shared<Gaussian>(4)), F_(4, 4) {
+  : kStateSpaceDim_(4),
+    LazerRadarFusion(std::make_shared<Gaussian>(4)),
+    F_(4, 4) {
 
   // initialize shared gaussian
   ResetState();
 
   // H_lazer - drop velocity
-  Eigen::MatrixXd H_lazer(2, 4);
+  Eigen::MatrixXd H_lazer(2, kStateSpaceDim_);
   H_lazer << 1, 0, 0, 0,
              0, 1, 0, 0;
 
@@ -138,6 +140,13 @@ FusionEKF::FusionEKF()
              0,    0,      0.09;
 
   radar_filter_ = std::make_shared<ExtendedKalmanFilter>(state_, R_radar);
+}
+
+
+Eigen::VectorXd FusionEKF::GetZeroU() const {
+  Eigen::VectorXd u(kStateSpaceDim_);
+  u.fill(0.0);
+  return u;
 }
 
 
@@ -162,7 +171,8 @@ Eigen::VectorXd FusionEKF::ToEstimate(const Eigen::VectorXd &x) const {
 
 
 FusionUKF::FusionUKF()
-  : LazerRadarFusion(std::make_shared<Gaussian>(5)) {
+  : kStateSpaceDim_(5),
+    LazerRadarFusion(std::make_shared<Gaussian>(5)) {
 
   ResetState();
 
@@ -201,6 +211,13 @@ FusionUKF::FusionUKF()
 }
 
 
+Eigen::VectorXd FusionUKF::GetZeroU() const {
+  Eigen::VectorXd u(kStateSpaceDim_);
+  u.fill(0.0);
+  return u;
+}
+
+
 void FusionUKF::ResetState() {
   state_->x_ << 1, 1, 1, 1, 1;
 
@@ -217,14 +234,14 @@ void FusionUKF::ResetState() {
 
 
 Eigen::VectorXd FusionUKF::ToEstimate(const Eigen::VectorXd &x) const {
-    Eigen::VectorXd estimate(4);
+  Eigen::VectorXd estimate(4);
 
-    const double px = x(0);
-    const double py = x(1);
-    const double v  = x(2);
-    const double yaw = x(3);
+  const double px = x(0);
+  const double py = x(1);
+  const double v  = x(2);
+  const double yaw = x(3);
 
-    estimate << px, py, cos(yaw) * v, sin(yaw) * v;
+  estimate << px, py, cos(yaw) * v, sin(yaw) * v;
 
-    return estimate;
+  return estimate;
 }

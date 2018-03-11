@@ -30,17 +30,77 @@ Eigen::VectorXd GetGroundTruthVector(const struct ground_truth &g) {
 }
 
 
-int main() {
+void help() {
+  std::cout << "kf [--ekf | --ukf]" << std::endl;
+  std::cout << std::endl;
+  std::cout << "Run Kalman Filter application in server mode." << std::endl << std::endl;
+  std::cout << "Options:" << std::endl;
+  std::cout << "    -h, --help - show help and exit with code 1" << std::endl;
+  std::cout << "    --ekf - use Extended Kalman Filter" << std::endl;
+  std::cout << "    --ukf - use Unscended Kalman Filter" << std::endl;
+  std::cout << std::endl;
+
+  exit(1);
+}
+
+enum Opt {
+  kOptUnknown = 0,
+  kOptHelp,
+  kOptEkf,
+  kOptUkf
+};
+
+
+Opt GetOpt(const std::string &opt) {
+  if (opt == "-h" or opt == "--help") return kOptHelp;
+  if (opt == "--ekf") return kOptEkf;
+  if (opt == "--ukf") return kOptUkf;
+  return kOptUnknown;
+};
+
+
+int main(int argc, char **argv) {
   uWS::Hub hub;
 
   std::vector<Eigen::VectorXd> estimations;
   std::vector<Eigen::VectorXd> ground_truth;
 
-  FusionUKF fusion;
+  std::shared_ptr<Fusion> fusion;
 
-  // fake control vector
-  Eigen::VectorXd u(5);
-  u << 0.0, 0.0, 0.0, 0.0, 0.0;
+  bool opt_use_ukf = true;
+
+  // parse arguments
+  for (int i = 1; i < argc; i++) {
+    switch (GetOpt(argv[i])) {
+
+    case kOptHelp:
+      help();
+      break;
+
+    case kOptEkf:
+      opt_use_ukf = false;
+      break;
+
+    case kOptUkf:
+      opt_use_ukf = true;
+      break;
+
+    default:
+      std::cout << "unknown option: " << argv[i] << std::endl << std::endl;
+      help();
+    }
+  }
+
+  if (opt_use_ukf) {
+    fusion = std::make_shared<FusionUKF>();
+    logging::info("Using UKF");
+  } else {
+    fusion = std::make_shared<FusionEKF>();
+    logging::info("Using EKF");
+  }
+
+    // fake control vector
+  const Eigen::VectorXd u = fusion->GetZeroU();
 
 
   if (! hub.listen(kListenPort)) {
@@ -52,11 +112,11 @@ int main() {
    * onConnection and onDisconnection are added to notify user about
    * important events.
    */
-  hub.onConnection([&hub, &fusion, &estimations, &ground_truth](uWS::WebSocket<uWS::SERVER> *ws, uWS::HttpRequest request) {
+  hub.onConnection([&hub, fusion, &estimations, &ground_truth](uWS::WebSocket<uWS::SERVER> *ws, uWS::HttpRequest request) {
       logging::info("Client connected.");
 
       // FIXME: hack, reinit state and drop clock
-      fusion.ResetState();
+      fusion->ResetState();
       estimations.clear();
       ground_truth.clear();
     });
@@ -92,7 +152,7 @@ int main() {
 
        std::cout << "*** Process measurement: " << m.sensor_type << std::endl;
 
-       Eigen::VectorXd estimate = fusion.ProcessMeasurement(m, u);
+       Eigen::VectorXd estimate = fusion->ProcessMeasurement(m, u);
        Eigen::VectorXd gtv = GetGroundTruthVector(g);
 
        estimations.push_back(estimate);
@@ -102,9 +162,9 @@ int main() {
 
        SendEstimate(ws, estimate, rmse);
 
-       std::cout << fusion.NowStr() << "GT = " << gtv.transpose() << std::endl;
-       fusion.PrintState();
-       std::cout << fusion.NowStr() << "RMSE = " << rmse.transpose() << std::endl;
+       std::cout << fusion->NowStr() << "GT = " << gtv.transpose() << std::endl;
+       fusion->PrintState();
+       std::cout << fusion->NowStr() << "RMSE = " << rmse.transpose() << std::endl;
      });
 
   logging::info("Listening to " + std::to_string(kListenPort) + " port");

@@ -51,6 +51,11 @@ class Fusion {
   const Eigen::VectorXd ProcessMeasurement(const struct measurement &m, const Eigen::VectorXd &u);
 
   /**
+   * Return "zero" control vector.
+   */
+  virtual Eigen::VectorXd GetZeroU() const = 0;
+
+  /**
    * Reset state_
    *
    * uWS server calls this method when client is connected
@@ -121,12 +126,16 @@ class FusionEKF: public LazerRadarFusion {
  public:
   FusionEKF();
 
+  Eigen::VectorXd GetZeroU() const;
+
   void ResetState();
 
  protected:
   Eigen::VectorXd ToEstimate(const Eigen::VectorXd &x) const;
 
  private:
+  const int kStateSpaceDim_;
+
   // matrices
   Eigen::MatrixXd F_;
 };
@@ -136,10 +145,15 @@ class FusionUKF: public LazerRadarFusion {
  public:
   FusionUKF();
 
+  Eigen::VectorXd GetZeroU() const;
+
   void ResetState();
 
  protected:
   Eigen::VectorXd ToEstimate(const Eigen::VectorXd &x) const;
+
+  private:
+    const int kStateSpaceDim_;
 };
 
 
