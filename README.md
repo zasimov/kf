@@ -1,7 +1,7 @@
-# The C++ Implementation of Extended Kalman Filter
+# The C++ Implementation of Kalman Filters
 
-This repository contains implementations of Kalman Filter and Extended
-Kalman Filter.
+This repository contains implementations of Kalman Filter, Extended
+Kalman Filter (EKF) and Unscended Kalman Filter (UKF).
 
 ## How to build (light way)
 
@@ -80,17 +80,42 @@ Make sure that the parser works and `ob_pose-laser-radar-synthetic-input.txt` is
 `build` folder contains the following applications that can be used
 for experiments:
 
-  * `ekf` runs WebSocket-server (port 4567) and can be used as a server for Udacity Term 2 Simulator
+  * `kf` runs WebSocket-server (port 4567) and can be used as a server for Udacity Term 2 Simulator
 
   * `objpose` reads measurements from a file and prints RMSE
 
+
+### kf application
+
+`kf` implements both EKF fusion and UKF fusion.
+
+To run UKF fusion use `kf --ukf` or just `kf`.
+
+To run EKF fusion use `kf --ekf`.
+
+
+### objpose application
+
+`objpose` can be used to calculate RMSE for EKF or UKF fusion.
+
+Use `objpose --ukf <filename>` to calculate RMSE using UKF fusion.
+
+Use `objpose --ekf <filename>` to calculate RMSE using EKF fusion.
+
+You can calculate RMSE both for UKF and EKF using
+
+    objpose --ukf obj_pose-laser-radar-synthetic-input.txt --ekf obj_pose-laser-radar-synthetic-input.txt
+
 ## Code exploration
 
-The main modules are `fusionekf` and `kalman_filter`. `fusionekf` is an
-implementation of fusion pipeline. `kalman_filter` contains
-implementation of kalman filter and extended kalman filter.
+The main modules are
 
-### fusionekf module
+  * `fusionekf` and `ekf` implement EKF fusion pipeline
+  * `fusionukf` and `ukf` implement UKF fusion pipeline
+
+### EKF
+
+#### fusionekf module
 
   * `FusionEKF::FusionEKF` initializes matrices (F, R_lazer, H_lazer,
     R_radar) and creates kalman filter as well as extended kalman filter.
@@ -99,18 +124,48 @@ implementation of kalman filter and extended kalman filter.
 
   * `FusionEKF::ProcessMeasurement` implements predict-update step.
 
-### kalman_filter module
+#### ekf module
 
-  * `AnstractKalmanFilter::Predict` implements `predict` step for
+`SimpleKalmanFilter` class is a base class for `LinearKalmanFilter`
+and `ExtendedKalmanFilter`.
+
+  * `SimpleKalmanFilter::Predict` implements `predict` step for
     kalman filter and extended kalman filter (there is the same code
     for KF and EKF)
 
-  * `AbstractKalmanFilter::Update` implements common `update` steps.
+  * `SimpleKalmanFilter::Update` implements common `update` steps.
 
 The difference between `LinearKalmanFilter` and `ExtendedKalmanFilter` is
 the way to calculate `H` matrix and `y` vector. See
 `LinearKalmanFilter::GetH`, `LinearKalmanFilter::GetY`,
 `ExtendedKalmanFilter::GetH`, `ExtendedKalmanFilter::GetY`.
+
+
+### UKF
+
+UKF fusion pipeline is more compilcated. Please see
+
+  * `ctrv` module implements CTRV-model equations
+
+  * `gaussian` module implements functions for sigma points calculation
+
+     * `CalculateSigmaPoints` calculates sigma points
+
+	 * `AugmentGaussian` builds augmented gaussian using `Q` matrix
+
+	 * `CalculateSigmaWeights` calculates `weights`
+
+	 * `PredictGaussian` "restores" a gaussian by predicted sigma
+       points. `PredictGaussian` uses an external function to
+       normalize angles.
+
+  * `ukf` module implements two filters: `LazerUKF` and
+    `RadarUKF`. Both `LazerUKF` and `RadarUKF` is based on
+    `CtrvUnscendedKalmanFilter` class which implementets whole
+    `Predict` and `Update` pipeline. `LazerUKF` and `RadarUKF`
+    implement additional initialization logic, normalization logic and
+    equation `MapXtoZ` `Update` method uses `MapXtoZ` to calculate
+    predicted sigma points in measurement space.
 
 ### json.hpp
 
@@ -118,11 +173,13 @@ The latest `json.hpp` can be found here - https://github.com/nlohmann/json
 
 ## Experiment
 
-    build/objpose obj_pose-laser-radar-synthetic-input.txt
+    build/objpose --ekf obj_pose-laser-radar-synthetic-input.txt \
+	              --ukf obj_pose-laser-radar-synthetic-input.txt
 
 The resulting RMSE is
 
-    0.0745332  0.074456  0.265846  0.249984
+    EKF: 0.0745332  0.074456  0.265846  0.249984
+    UKF: 0.0720093  0.064579  0.182584  0.288182
 
 
 ## Udacity Term 2 Simulator v1.45
