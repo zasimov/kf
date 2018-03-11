@@ -1,6 +1,6 @@
 set(CMAKE_LEGACY_CYGWIN_WIN32 0)
 cmake_minimum_required (VERSION 2.8.4)
-project (EKF)
+project (KF)
 
 set(EIGEN_PATH ${CMAKE_CURRENT_SOURCE_DIR}/eigen-git-mirror)
 include_directories(${EIGEN_PATH})
@@ -21,11 +21,11 @@ find_library(UV_LIBRARY NAMES uv)
 find_library(UWS_LIBRARY NAMES uWS PATHS ${UWS_LIB_PATH} NO_DEFAULT_PATH)
 find_library(M_LIBRARY NAMES m)
 
-add_executable(ekf main.cpp gaussian.cpp math.cpp parser.cpp protocol.cpp logging.cpp kalman_filter.cpp fusionekf.cpp ctrv.cpp)
-set_property(TARGET ekf PROPERTY CXX_STANDARD 11)
-target_link_libraries(ekf ${UV_LIBRARY} ${UWS_LIBRARY} ${ZLIB_LIBRARIES} ${OPENSSL_LIBRARIES})
+add_executable(kf main.cpp gaussian.cpp math.cpp parser.cpp protocol.cpp logging.cpp ekf.cpp ukf.cpp fusion.cpp fusionekf.cpp fusionukf.cpp ctrv.cpp)
+set_property(TARGET kf PROPERTY CXX_STANDARD 11)
+target_link_libraries(kf ${UV_LIBRARY} ${UWS_LIBRARY} ${ZLIB_LIBRARIES} ${OPENSSL_LIBRARIES})
 
-add_executable(objpose objpose.cpp gaussian.cpp math.cpp parser.cpp logging.cpp kalman_filter.cpp fusionekf.cpp ctrv.cpp)
+add_executable(objpose objpose.cpp gaussian.cpp math.cpp parser.cpp logging.cpp ekf.cpp ctrv.cpp ukf.cpp fusion.cpp fusionekf.cpp fusionukf.cpp)
 set_property(TARGET objpose PROPERTY CXX_STANDARD 11)
 
 find_package(GTest)
