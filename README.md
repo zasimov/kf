@@ -174,7 +174,6 @@ UKF fusion pipeline is more compilcated. Please see
 	     * `std(py) = 0.15`
 
 	 * Q matrix (process noise)
-
 	   * `std(a) = 0.2` - longitudinal acceleration
 	   * `std(yawdd) = 0.2` - yaw acceleration
 
